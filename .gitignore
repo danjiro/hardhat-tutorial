@@ -4,5 +4,6 @@ cache/
 build/
 typechain/
 artifacts/
+.openZeppelin/
 coverage*
 .env

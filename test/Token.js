@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { ethers, upgrades } = require("hardhat");
 
 describe('Token contract', () => {
   let Token;
@@ -10,8 +11,9 @@ describe('Token contract', () => {
 
   beforeEach(async () => {
     Token = await ethers.getContractFactory('Token');
+    TokenV2 = await ethers.getContractFactory('TokenV2');
     [owner, address1, address2, addresses] = await ethers.getSigners();
-    hardHatToken = await Token.deploy();
+    hardHatToken = await upgrades.deployProxy(Token, ['Danjiro token', 'DJRO', 1000000]);
   });
 
   describe('Deployment', () => {
@@ -53,5 +55,22 @@ describe('Token contract', () => {
       expect(await hardHatToken.balanceOf(address1.address)).to.equal(69);
       expect(await hardHatToken.balanceOf(address2.address)).to.equal(420);
     });
-  })
+  });
+
+  describe('Upgrade to Token V2', () => {
+    it('should keep state after upgrading', async() => {
+      const initialOwnerBalance = await hardHatToken.balanceOf(owner.address);
+
+      await hardHatToken.transfer(address1.address, 10);
+
+      const newOwnerBalance = await hardHatToken.balanceOf(owner.address);
+
+      expect(newOwnerBalance).to.equal(initialOwnerBalance - 10);
+
+      const hardHatTokenV2 = await upgrades.upgradeProxy(hardHatToken.address, TokenV2);
+
+      expect(await hardHatTokenV2.balanceOf(owner.address)).to.equal(newOwnerBalance);
+      expect(await hardHatTokenV2.balanceOf(address1.address)).to.equal(10);
+    })
+  });
 });
