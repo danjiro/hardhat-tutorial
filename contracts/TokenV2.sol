@@ -41,16 +41,12 @@ contract TokenV2 is Initializable {
     randNonce += 1;
     uint randNumber = uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce))) % 100;
 
-    console.log('randNumber => ', randNumber);
-    if (randNonce >= winThreshold) {
-      console.log('win => ');
+    if (randNumber >= winThreshold) {
       balances[msg.sender] += _amount;
     } else {
-      console.log('lose => ');
       balances[msg.sender] -= _amount;
     }
 
-    console.log('balances[msg.sender] => ', balances[msg.sender]);
     return balances[msg.sender];
   }
 }

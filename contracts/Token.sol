@@ -19,6 +19,8 @@ contract Token is Initializable {
     totalSupply = _totalSupply;
     balances[msg.sender] = totalSupply;
     owner = msg.sender;
+    randNonce = 0;
+    winThreshold = 50;
   }
 
   function transfer(address _to, uint256 _amount) external {

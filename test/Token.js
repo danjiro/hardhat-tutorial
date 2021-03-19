@@ -71,6 +71,35 @@ describe('Token contract', () => {
 
       expect(await hardHatTokenV2.balanceOf(owner.address)).to.equal(newOwnerBalance);
       expect(await hardHatTokenV2.balanceOf(address1.address)).to.equal(10);
-    })
+    });
+
+    it('should have gamble feature defined', async () => {
+      const hardHatTokenV2 = await upgrades.upgradeProxy(hardHatToken.address, TokenV2);
+
+      expect(hardHatTokenV2.gamble).not.to.be.undefined;
+    });
+  });
+
+  describe('Gamble', () => {
+    let hardHatTokenV2;
+
+    beforeEach(async () => {
+      hardHatTokenV2 = await upgrades.upgradeProxy(hardHatToken.address, TokenV2);
+    });
+
+    it('should fail if sender does not have enough tokens', async () => {
+      const initialOwnerBalance = await hardHatTokenV2.balanceOf(owner.address);
+
+      await expect(hardHatTokenV2.gamble(initialOwnerBalance + 1)).to.be.revertedWith('Not enough tokens');
+      expect(await hardHatTokenV2.balanceOf(owner.address)).to.equal(initialOwnerBalance);
+    });
+
+    it('should win or lose bet ammount', async () => {
+      const initialOwnerBalance = (await hardHatTokenV2.balanceOf(owner.address)).toNumber();
+
+      await hardHatTokenV2.gamble(10);
+
+      expect((await hardHatTokenV2.balanceOf(owner.address)).toNumber()).to.be.oneOf([initialOwnerBalance - 10, initialOwnerBalance + 10]);
+    });
   });
 });

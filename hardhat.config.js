@@ -4,6 +4,7 @@ dotEnvConfig();
 require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-etherscan');
 require('@openzeppelin/hardhat-upgrades');
+require('hardhat-watcher');
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -21,5 +22,12 @@ module.exports = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+  watcher: {
+    test: {
+      tasks: [{ command: 'test', params: { testFiles: ['{path}'] } }],
+      files: ['./test/**/*'],
+      verbose: true,
+    },
   },
 };
